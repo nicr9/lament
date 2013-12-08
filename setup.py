@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='lament',
-    version='0.1.0',
+    version='v0.1',
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['lament'],
