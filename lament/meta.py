@@ -2,12 +2,12 @@ from copy import deepcopy
 
 class ConfigMeta(type):
     def __new__(mcls, name, bases, cdict):
-        lament = []
-        _default = {}
-        _export = []
+        _config_keys = []
+        _defaults = {}
+        _export_keys = []
 
         def _getattr(self, name):
-            if name in self.lament:
+            if name in self._config_keys:
                 return self._config[name]
             else:
                 super(object, self).__getattr__(name)
@@ -15,18 +15,18 @@ class ConfigMeta(type):
         allowed = set(['__module__', '__metaclass__', '__doc__'])
         for key, value in cdict.items():
             if key not in allowed:
-                if hasattr(value, '__lament__'):
-                    lament.append(value.__lament__)
-                    _default[value.__lament__] = value.__conf__
-                    cdict['_%s' % key] = value
+                if hasattr(value, '__lament_con__'):
+                    _config_keys.append(value.__lament_con__)
+                    _defaults[value.__lament_con__] = value.__lament_df__
+                    cdict['_con_%s' % key] = value
                     del cdict[key]
-                if hasattr(value, '__export__'):
-                    _export.append(value.__export__)
-                    cdict['_ex_%s' % value.__export__] = value
+                if hasattr(value, '__lament_ex__'):
+                    _export_keys.append(value.__lament_ex__)
+                    cdict['_ex_%s' % value.__lament_ex__] = value
 
-        cdict['lament'] = lament
-        cdict['_default']  = _default
-        cdict['_export']  = _export
+        cdict['_config_keys'] = _config_keys
+        cdict['_defaults']  = _defaults
+        cdict['_export_keys']  = _export_keys
         cdict['_config'] = {}
         cdict['__getattr__'] = _getattr
 
@@ -34,13 +34,13 @@ class ConfigMeta(type):
 
 def config(key, default):
     def _con(func):
-        setattr(func, '__lament__', key)
-        setattr(func, '__conf__', default)
+        setattr(func, '__lament_con__', key)
+        setattr(func, '__lament_df__', default)
         return func
     return _con
 
 def export(key):
     def _exp(func):
-        setattr(func, '__export__', key)
+        setattr(func, '__lament_ex__', key)
         return func
     return _exp

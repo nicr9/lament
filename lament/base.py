@@ -9,7 +9,7 @@ class LamentConfig(object):
     __metaclass__ = ConfigMeta
 
     def __init__(self, **kwargs):
-        self._config = _get_instances(self._default)
+        self._config = _get_instances(self._defaults)
         self.update(**kwargs)
 
     @classmethod
@@ -31,8 +31,8 @@ class LamentConfig(object):
             if isinstance(val, unicode):
                 val = str(val)
 
-            if key in self.lament:
-                self._config[key] = getattr(self, '_%s' % key)(
+            if key in self._config_keys:
+                self._config[key] = getattr(self, '_con_%s' % key)(
                         self._config[key],
                         val
                         )
@@ -43,8 +43,8 @@ class LamentConfig(object):
 
     def export(self):
         temp = {}
-        for key in self.lament:
-            if key in self._export:
+        for key in self._config_keys:
+            if key in self._export_keys:
                 temp[key] = getattr(self, '_ex_%s' % key)(
                         self._config[key]
                         )

@@ -56,7 +56,7 @@ class TestLamentConfig(unittest.TestCase):
     def _check_values(self, config, vals):
         # Check all keys are there
         self.assertEqual(
-                set(config.lament),
+                set(config._config_keys),
                 set(vals.keys())
                 )
 
