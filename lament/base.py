@@ -38,8 +38,9 @@ class LamentConfig(object):
                         )
 
     def export_to_file(self, file_path):
-        with ConfigFile(file_path) as outp:
-            outp.update(self.export)
+        with ConfigFile(file_path, True) as outp:
+            outp.clear() # We want to overwrite the file, not update
+            outp.update(self.export())
 
     def export(self):
         temp = {}
