@@ -255,3 +255,50 @@ class TestLamentConfig(unittest.TestCase):
                     'numbers': [1],
                     }
                 )
+
+    def test_to_file(self):
+        before = Example(
+                hello='Blah',
+                goodbye=10,
+                other=ABCD,
+                is_false=True,
+                numbers=1
+                )
+
+        with TF(delete=False) as f:
+            first = f.name
+            before.export_to_file(first)
+
+        after = Example.from_file(first)
+        self._check_values(after, {
+            'hello': 'Blah',
+            'goodbye': [10],
+            'other': ABCD,
+            'is_false': True,
+            'numbers': [1],
+            })
+
+        before2 = Example(
+                hello='bar',
+                goodbye=[4, 5, 6],
+                other=EFGH,
+                is_false=False,
+                numbers='b'
+                )
+
+        with TF(delete=False) as f:
+            second = f.name
+            before2.export_to_file(second)
+
+        after2 = Example.from_file(second)
+        self._check_values(after2, {
+            'hello':'bar',
+            'goodbye': [4, 5, 6],
+            'other': EFGH,
+            'is_false': False,
+            'numbers': [],
+            })
+
+        # Clean up
+        remove(first)
+        remove(second)
