@@ -16,40 +16,40 @@ ALL_LETTERS.update(ABCD)
 ALL_LETTERS.update(EFGH)
 
 # Example subclass
-class Example(LamentConfig):
-    @config('hello', str)
-    def hello(self, config, obj):
+class ExampleConfig(LamentConfig):
+    @config('str_type', str)
+    def str_type(self, config, obj):
         if isinstance(obj, str):
             return obj
         return config
 
-    @config('goodbye', list)
-    def goodbye(self, config, obj):
+    @config('list_type', list)
+    def list_type(self, config, obj):
         if isinstance(obj, list):
             return obj
         config.append(obj)
         return config
 
-    @config('other', dict)
-    def other(self, config, obj):
+    @config('dict_type', dict)
+    def dict_type(self, config, obj):
         if isinstance(obj, dict):
             config.update(obj)
         return config
 
-    @config('is_false', bool)
-    def is_false(self, config, obj):
+    @config('bool_type', bool)
+    def bool_type(self, config, obj):
         return obj
 
-    @config('numbers', list)
-    def numbers(self, config, obj):
+    @config('list_int_only', list)
+    def list_int_only(self, config, obj):
         if isinstance(obj, list):
             config.extend(obj)
         else:
             config.append(obj)
         return config
 
-    @export('numbers')
-    def export_numbers(self, obj):
+    @export('list_int_only')
+    def export_int_only(self, obj):
         return [z for z in obj if isinstance(z, int)]
 
 class TestLamentConfig(unittest.TestCase):
@@ -61,135 +61,135 @@ class TestLamentConfig(unittest.TestCase):
                 )
 
         # Check key values
-        self.assertEqual(config.hello, vals['hello'])
-        self.assertEqual(config.goodbye, vals['goodbye'])
-        self.assertEqual(config.other,vals['other'])
-        self.assertEqual(config.is_false, vals['is_false'])
-        self.assertEqual(config.numbers, vals['numbers'])
+        self.assertEqual(config.str_type, vals['str_type'])
+        self.assertEqual(config.list_type, vals['list_type'])
+        self.assertEqual(config.dict_type,vals['dict_type'])
+        self.assertEqual(config.bool_type, vals['bool_type'])
+        self.assertEqual(config.list_int_only, vals['list_int_only'])
 
     def test_create(self):
         # Create with default values
-        temp = Example()
+        temp = ExampleConfig()
 
         self._check_values(temp, {
-            'hello': '',
-            'goodbye': [],
-            'other': {},
-            'is_false': False,
-            'numbers': [],
+            'str_type': '',
+            'list_type': [],
+            'dict_type': {},
+            'bool_type': False,
+            'list_int_only': [],
             })
 
         # Create with overridden values
-        temp = Example(
-                hello='hi',
-                goodbye=5,
-                other=ABCD,
-                is_false=True,
-                numbers=1,
+        temp = ExampleConfig(
+                str_type='hi',
+                list_type=5,
+                dict_type=ABCD,
+                bool_type=True,
+                list_int_only=1,
                 )
 
         self._check_values(temp, {
-            'hello': 'hi',
-            'goodbye': [5],
-            'other': ABCD,
-            'is_false': True,
-            'numbers': [1],
+            'str_type': 'hi',
+            'list_type': [5],
+            'dict_type': ABCD,
+            'bool_type': True,
+            'list_int_only': [1],
             })
 
     def test_alter(self):
         # Create with default values
-        temp = Example()
+        temp = ExampleConfig()
 
         self._check_values(temp, {
-            'hello': '',
-            'goodbye': [],
-            'other': {},
-            'is_false': False,
-            'numbers': [],
+            'str_type': '',
+            'list_type': [],
+            'dict_type': {},
+            'bool_type': False,
+            'list_int_only': [],
             })
 
         # Update values
-        temp.update(hello='ello')
-        temp.update(goodbye='1')
-        temp.update(other=EFGH)
-        temp.update(is_false=True)
-        temp.update(numbers=[1, 2, 3])
+        temp.update(str_type='ello')
+        temp.update(list_type='1')
+        temp.update(dict_type=EFGH)
+        temp.update(bool_type=True)
+        temp.update(list_int_only=[1, 2, 3])
 
         self._check_values(temp, {
-            'hello': 'ello',
-            'goodbye': ['1'],
-            'other': EFGH,
-            'is_false': True,
-            'numbers': [1, 2, 3],
+            'str_type': 'ello',
+            'list_type': ['1'],
+            'dict_type': EFGH,
+            'bool_type': True,
+            'list_int_only': [1, 2, 3],
             })
 
         # Create with overridden values
-        temp = Example(
-                hello='hi',
-                goodbye=5,
-                other=ABCD,
-                is_false=True
+        temp = ExampleConfig(
+                str_type='hi',
+                list_type=5,
+                dict_type=ABCD,
+                bool_type=True
                 )
 
         self._check_values(temp, {
-            'hello': 'hi',
-            'goodbye': [5],
-            'other': ABCD,
-            'is_false': True,
-            'numbers': [],
+            'str_type': 'hi',
+            'list_type': [5],
+            'dict_type': ABCD,
+            'bool_type': True,
+            'list_int_only': [],
             })
 
         # Update values
-        temp.update(hello='ello')
-        temp.update(goodbye=1)
-        temp.update(other=EFGH)
-        temp.update(is_false=True)
+        temp.update(str_type='ello')
+        temp.update(list_type=1)
+        temp.update(dict_type=EFGH)
+        temp.update(bool_type=True)
 
         self._check_values(temp, {
-            'hello': 'ello',
-            'goodbye': [5, 1],
-            'other': ALL_LETTERS,
-            'is_false': True,
-            'numbers': [],
+            'str_type': 'ello',
+            'list_type': [5, 1],
+            'dict_type': ALL_LETTERS,
+            'bool_type': True,
+            'list_int_only': [],
             })
 
     def test_from_file(self):
         with TF(delete=False) as f:
             first = f.name
             dump({
-                'hello':'foo',
-                'goodbye': [1, 2, 3],
-                'other': ABCD,
-                'is_false': True,
-                'numbers': [],
+                'str_type':'foo',
+                'list_type': [1, 2, 3],
+                'dict_type': ABCD,
+                'bool_type': True,
+                'list_int_only': [],
                 }, f)
 
         with TF(delete=False) as f:
             second = f.name
             dump({
-                'hello':'bar',
-                'goodbye': [4, 5, 6],
-                'other': EFGH,
-                'is_false': False,
-                'numbers': [],
+                'str_type':'bar',
+                'list_type': [4, 5, 6],
+                'dict_type': EFGH,
+                'bool_type': False,
+                'list_int_only': [],
                 }, f)
 
-        temp = Example.from_file(first)
+        temp = ExampleConfig.from_file(first)
         self._check_values(temp, {
-            'hello': 'foo',
-            'goodbye': [1, 2, 3],
-            'other': ABCD,
-            'is_false': True,
-            'numbers': [],
+            'str_type': 'foo',
+            'list_type': [1, 2, 3],
+            'dict_type': ABCD,
+            'bool_type': True,
+            'list_int_only': [],
             })
 
         temp.update_from_file(second)
         self._check_values(temp, {
-            'hello': 'bar',
-            'goodbye': [4, 5, 6],
-            'other': ALL_LETTERS,
-            'is_false': False,
-            'numbers': [],
+            'str_type': 'bar',
+            'list_type': [4, 5, 6],
+            'dict_type': ALL_LETTERS,
+            'bool_type': False,
+            'list_int_only': [],
             })
 
         # Clean up
@@ -197,106 +197,106 @@ class TestLamentConfig(unittest.TestCase):
         remove(second)
 
     def test_default(self):
-        temp = Example()
+        temp = ExampleConfig()
         self._check_values(temp, {
-            'hello': '',
-            'goodbye': [],
-            'other': {},
-            'is_false': False,
-            'numbers': [],
+            'str_type': '',
+            'list_type': [],
+            'dict_type': {},
+            'bool_type': False,
+            'list_int_only': [],
             })
 
     def test_wrong_type(self):
-        temp = Example(
-                hello=10,
-                other=10,
-                is_false=0
+        temp = ExampleConfig(
+                str_type=10,
+                dict_type=10,
+                bool_type=0
                 )
         self._check_values(temp, {
-            'hello': '',
-            'goodbye': [],
-            'other': {},
-            'is_false': False,
-            'numbers': [],
+            'str_type': '',
+            'list_type': [],
+            'dict_type': {},
+            'bool_type': False,
+            'list_int_only': [],
             })
 
     def test_export(self):
-        temp = Example(
-                hello='Blah',
-                goodbye=10,
-                other=ABCD,
-                is_false=True,
-                numbers=1
+        temp = ExampleConfig(
+                str_type='Blah',
+                list_type=10,
+                dict_type=ABCD,
+                bool_type=True,
+                list_int_only=1
                 )
         self.assertEqual(
                 temp.export(),
                 {
-                    'hello': 'Blah',
-                    'goodbye': [10],
-                    'other': ABCD,
-                    'is_false': True,
-                    'numbers': [1],
+                    'str_type': 'Blah',
+                    'list_type': [10],
+                    'dict_type': ABCD,
+                    'bool_type': True,
+                    'list_int_only': [1],
                     }
                 )
 
         # Update values
-        temp.update(hello='ello')
-        temp.update(goodbye=1)
-        temp.update(other=EFGH)
-        temp.update(is_false=False)
-        temp.update(numbers='b')
+        temp.update(str_type='ello')
+        temp.update(list_type=1)
+        temp.update(dict_type=EFGH)
+        temp.update(bool_type=False)
+        temp.update(list_int_only='b')
         self.assertEqual(
                 temp.export(),
                 {
-                    'hello': 'ello',
-                    'goodbye': [10, 1],
-                    'other': ALL_LETTERS,
-                    'is_false': False,
-                    'numbers': [1],
+                    'str_type': 'ello',
+                    'list_type': [10, 1],
+                    'dict_type': ALL_LETTERS,
+                    'bool_type': False,
+                    'list_int_only': [1],
                     }
                 )
 
     def test_to_file(self):
-        before = Example(
-                hello='Blah',
-                goodbye=10,
-                other=ABCD,
-                is_false=True,
-                numbers=1
+        before = ExampleConfig(
+                str_type='Blah',
+                list_type=10,
+                dict_type=ABCD,
+                bool_type=True,
+                list_int_only=1
                 )
 
         with TF(delete=False) as f:
             first = f.name
             before.export_to_file(first)
 
-        after = Example.from_file(first)
+        after = ExampleConfig.from_file(first)
         self._check_values(after, {
-            'hello': 'Blah',
-            'goodbye': [10],
-            'other': ABCD,
-            'is_false': True,
-            'numbers': [1],
+            'str_type': 'Blah',
+            'list_type': [10],
+            'dict_type': ABCD,
+            'bool_type': True,
+            'list_int_only': [1],
             })
 
-        before2 = Example(
-                hello='bar',
-                goodbye=[4, 5, 6],
-                other=EFGH,
-                is_false=False,
-                numbers='b'
+        before2 = ExampleConfig(
+                str_type='bar',
+                list_type=[4, 5, 6],
+                dict_type=EFGH,
+                bool_type=False,
+                list_int_only='b'
                 )
 
         with TF(delete=False) as f:
             second = f.name
             before2.export_to_file(second)
 
-        after2 = Example.from_file(second)
+        after2 = ExampleConfig.from_file(second)
         self._check_values(after2, {
-            'hello':'bar',
-            'goodbye': [4, 5, 6],
-            'other': EFGH,
-            'is_false': False,
-            'numbers': [],
+            'str_type':'bar',
+            'list_type': [4, 5, 6],
+            'dict_type': EFGH,
+            'bool_type': False,
+            'list_int_only': [],
             })
 
         # Clean up
