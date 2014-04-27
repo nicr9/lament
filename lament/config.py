@@ -6,16 +6,16 @@ class ConfigFile(object):
     def __init__(self, config_path, create=False):
         self.head = os.path.dirname(config_path)
         self.create = create
-        
+        self.config = None
+
         if os.path.isdir(self.head):
             self.path = config_path
         else:
             raise Exception("%s doesn't exist" % self.head)
 
     def __enter__(self):
-        self.config = None
-
         self.config = {}
+
         if os.path.isfile(self.path):
             with open(self.path, 'r') as inp:
                 try:

@@ -1,3 +1,4 @@
+from re import match
 from config import ConfigFile
 from meta import ConfigMeta
 from copy import deepcopy
@@ -31,11 +32,30 @@ class LamentConfig(object):
             if isinstance(val, unicode):
                 val = str(val)
 
+            # Regular key
             if key in self._config_keys:
                 self._config[key] = getattr(self, '_con_%s' % key)(
                         self._config[key],
                         val
                         )
+                continue
+
+            # Regex key
+            split_key = key.split()
+            if len(split_key) == 2:
+                key, sub = split_key
+                if self._re_match(key, sub):
+                    old = self._re_oldval(key, sub)
+                    self._re_config[key][sub] = getattr(self, '_re_con_%s' % key)(
+                            old,
+                            val
+                            )
+
+    def _re_match(self, key, sub):
+        return key in self._re_keys and match(self._re_patterns[key], sub)
+
+    def _re_oldval(self, key, sub):
+        return self._re_config[key].set_default(sub, self._re_defaults[key]())
 
     def export_to_file(self, file_path):
         with ConfigFile(file_path, True) as outp:
@@ -51,5 +71,15 @@ class LamentConfig(object):
                         )
             else:
                 temp[key] = self._config[key]
+
+        for key in self._re_keys:
+            for sub in self._re_config[key].iterkeys():
+                full_key = '%s %s' % (key, sub)
+                if key in self._export_keys:
+                    temp[full_key] = getattr(self, '_ex_%s' % key)(
+                            self._config[key][sub]
+                            )
+                else:
+                    temp[full_key] = self._config[key][sub]
 
         return temp
