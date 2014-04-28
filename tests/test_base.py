@@ -15,6 +15,20 @@ ALL_LETTERS = {}
 ALL_LETTERS.update(ABCD)
 ALL_LETTERS.update(EFGH)
 
+SUPER_MARIO = {'regex_string mario': 'luigi'}
+SONIC_HEDGEHOG = {'regex_string sonic': 'tails'}
+
+DEFAULT_VALS = {
+        'str_type': '',
+        'list_type': [],
+        'dict_type': {},
+        'bool_type': False,
+        'list_int_only': [],
+        }
+DEFAULT_RE_VALS = {
+        'regex_string': {},
+        }
+
 # Example subclass
 class ExampleConfig(LamentConfig):
     @config('str_type', str)
@@ -87,16 +101,7 @@ class TestLamentConfig(unittest.TestCase):
         # Create with default values
         temp = ExampleConfig()
 
-        self._check_values(temp, {
-            'str_type': '',
-            'list_type': [],
-            'dict_type': {},
-            'bool_type': False,
-            'list_int_only': [],
-            },
-            {
-            'regex_string': {},
-            })
+        self._check_values(temp, DEFAULT_VALS, DEFAULT_RE_VALS)
 
         # Create with overridden values
         temp = ExampleConfig(
@@ -113,25 +118,13 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [1],
-            },
-            {
-            'regex_string': {},
-            })
+            }, DEFAULT_RE_VALS)
 
     def test_alter(self):
         # Create with default values
         temp = ExampleConfig()
 
-        self._check_values(temp, {
-            'str_type': '',
-            'list_type': [],
-            'dict_type': {},
-            'bool_type': False,
-            'list_int_only': [],
-            },
-            {
-            'regex_string': {},
-            })
+        self._check_values(temp, DEFAULT_VALS, DEFAULT_RE_VALS)
 
         # Update values
         temp.update(str_type='ello')
@@ -139,7 +132,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
         temp.update(list_int_only=[1, 2, 3])
-        temp.update(**{'regex_string mario': 'luigi'})
+        temp.update(**SUPER_MARIO)
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -160,7 +153,7 @@ class TestLamentConfig(unittest.TestCase):
                 list_type=5,
                 dict_type=ABCD,
                 bool_type=True,
-                **{'regex_string mario': 'luigi'}
+                **SUPER_MARIO
                 )
 
         self._check_values(temp, {
@@ -181,7 +174,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(list_type=1)
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
-        temp.update(**{'regex_string sonic': 'tails'})
+        temp.update(**SONIC_HEDGEHOG)
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -255,16 +248,7 @@ class TestLamentConfig(unittest.TestCase):
 
     def test_default(self):
         temp = ExampleConfig()
-        self._check_values(temp, {
-            'str_type': '',
-            'list_type': [],
-            'dict_type': {},
-            'bool_type': False,
-            'list_int_only': [],
-            },
-            {
-            'regex_string': {},
-            })
+        self._check_values(temp, DEFAULT_VALS, DEFAULT_RE_VALS)
 
     def test_wrong_type(self):
         temp = ExampleConfig(
@@ -273,16 +257,7 @@ class TestLamentConfig(unittest.TestCase):
                 bool_type=0,
                 **{'regex_string badtype': 2}
                 )
-        self._check_values(temp, {
-            'str_type': '',
-            'list_type': [],
-            'dict_type': {},
-            'bool_type': False,
-            'list_int_only': [],
-            },
-            {
-            'regex_string': {},
-            })
+        self._check_values(temp, DEFAULT_VALS, DEFAULT_RE_VALS)
 
     def test_export(self):
         temp = ExampleConfig(
@@ -291,7 +266,7 @@ class TestLamentConfig(unittest.TestCase):
                 dict_type=ABCD,
                 bool_type=True,
                 list_int_only=1,
-                **{'regex_string mario': 'luigi'}
+                **SUPER_MARIO
                 )
         self.assertEqual(
                 temp.export(),
@@ -311,7 +286,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(dict_type=EFGH)
         temp.update(bool_type=False)
         temp.update(list_int_only='b')
-        temp.update(**{'regex_string sonic': 'tails'})
+        temp.update(**SONIC_HEDGEHOG)
         self.assertEqual(
                 temp.export(),
                 {
@@ -332,7 +307,7 @@ class TestLamentConfig(unittest.TestCase):
                 dict_type=ABCD,
                 bool_type=True,
                 list_int_only=1,
-                **{'regex_string mario': 'luigi'}
+                **SUPER_MARIO
                 )
 
         with TF(delete=False) as f:
@@ -359,7 +334,7 @@ class TestLamentConfig(unittest.TestCase):
                 dict_type=EFGH,
                 bool_type=False,
                 list_int_only='b',
-                **{'regex_string sonic': 'tails'}
+                **SONIC_HEDGEHOG
                 )
 
         with TF(delete=False) as f:
