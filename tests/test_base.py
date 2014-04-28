@@ -159,7 +159,8 @@ class TestLamentConfig(unittest.TestCase):
                 str_type='hi',
                 list_type=5,
                 dict_type=ABCD,
-                bool_type=True
+                bool_type=True,
+                **{'regex_string mario': 'luigi'}
                 )
 
         self._check_values(temp, {
@@ -170,7 +171,9 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'mario': 'luigi',
+                },
             })
 
         # Update values
@@ -178,6 +181,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(list_type=1)
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
+        temp.update(**{'regex_string sonic': 'tails'})
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -187,7 +191,10 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'mario': 'luigi',
+                'sonic': 'tails',
+                },
             })
 
     def test_from_file(self):
@@ -199,6 +206,7 @@ class TestLamentConfig(unittest.TestCase):
                 'dict_type': ABCD,
                 'bool_type': True,
                 'list_int_only': [],
+                'regex_string mario': 'luigi',
                 }, f)
 
         with TF(delete=False) as f:
@@ -209,6 +217,7 @@ class TestLamentConfig(unittest.TestCase):
                 'dict_type': EFGH,
                 'bool_type': False,
                 'list_int_only': [],
+                'regex_string sonic': 'tails',
                 }, f)
 
         temp = ExampleConfig.from_file(first)
@@ -220,7 +229,9 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'mario': 'luigi',
+                },
             })
 
         temp.update_from_file(second)
@@ -232,7 +243,10 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'mario': 'luigi',
+                'sonic': 'tails',
+                },
             })
 
         # Clean up
@@ -256,7 +270,8 @@ class TestLamentConfig(unittest.TestCase):
         temp = ExampleConfig(
                 str_type=10,
                 dict_type=10,
-                bool_type=0
+                bool_type=0,
+                **{'regex_string badtype': 2}
                 )
         self._check_values(temp, {
             'str_type': '',
