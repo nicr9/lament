@@ -81,9 +81,9 @@ class LamentConfig(object):
                 full_key = '%s %s' % (key, sub)
                 if key in self._export_keys:
                     temp[full_key] = getattr(self, '_ex_%s' % key)(
-                            self._config[key][sub]
+                            self._re_config[key][sub]
                             )
                 else:
-                    temp[full_key] = self._config[key][sub]
+                    temp[full_key] = self._re_config[key][sub]
 
         return temp
