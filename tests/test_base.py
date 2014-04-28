@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile as TF
 from json import dump
 from os import remove
 
-from meta import config, export
+from meta import config, regex_config, export
 from base import LamentConfig
 
 # Constants
@@ -48,16 +48,29 @@ class ExampleConfig(LamentConfig):
             config.append(obj)
         return config
 
+    @regex_config('regex_string', '.*', str)
+    def regex_string(self, config, obj):
+        if isinstance(obj, str):
+            return obj
+        else:
+            return config
+
     @export('list_int_only')
     def export_int_only(self, obj):
         return [z for z in obj if isinstance(z, int)]
 
 class TestLamentConfig(unittest.TestCase):
-    def _check_values(self, config, vals):
+    def _check_values(self, config, vals, re_vals):
         # Check all keys are there
         self.assertEqual(
                 set(config._config_keys),
                 set(vals.keys())
+                )
+
+        # Check all regex keys are there
+        self.assertEqual(
+                set(config._re_keys),
+                set(re_vals.keys())
                 )
 
         # Check key values
@@ -66,6 +79,9 @@ class TestLamentConfig(unittest.TestCase):
         self.assertEqual(config.dict_type,vals['dict_type'])
         self.assertEqual(config.bool_type, vals['bool_type'])
         self.assertEqual(config.list_int_only, vals['list_int_only'])
+
+        # Check regex keys contain dicts
+        self.assertEqual(config.regex_string, re_vals['regex_string'])
 
     def test_create(self):
         # Create with default values
@@ -77,6 +93,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': {},
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         # Create with overridden values
@@ -94,6 +113,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [1],
+            },
+            {
+            'regex_string': {},
             })
 
     def test_alter(self):
@@ -106,6 +128,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': {},
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         # Update values
@@ -114,6 +139,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
         temp.update(list_int_only=[1, 2, 3])
+        temp.update(**{'regex_string mario': 'luigi'})
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -121,6 +147,11 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': EFGH,
             'bool_type': True,
             'list_int_only': [1, 2, 3],
+            },
+            {
+            'regex_string': {
+                'mario': 'luigi',
+                },
             })
 
         # Create with overridden values
@@ -137,6 +168,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         # Update values
@@ -151,6 +185,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ALL_LETTERS,
             'bool_type': True,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
     def test_from_file(self):
@@ -181,6 +218,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         temp.update_from_file(second)
@@ -190,6 +230,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ALL_LETTERS,
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         # Clean up
@@ -204,6 +247,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': {},
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
     def test_wrong_type(self):
@@ -218,6 +264,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': {},
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
     def test_export(self):
@@ -276,6 +325,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [1],
+            },
+            {
+            'regex_string': {},
             })
 
         before2 = ExampleConfig(
@@ -297,6 +349,9 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': EFGH,
             'bool_type': False,
             'list_int_only': [],
+            },
+            {
+            'regex_string': {},
             })
 
         # Clean up
