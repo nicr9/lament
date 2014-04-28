@@ -5,7 +5,7 @@ class ConfigMeta(type):
         _config_keys = []
         _defaults = {}
         _re_keys = []
-        _re_patterns = []
+        _re_patterns = {}
         _re_defaults = {}
         _export_keys = []
 
@@ -63,7 +63,7 @@ def config(key, default):
 def regex_config(key, pattern, default):
     def _con(func):
         setattr(func, '__lament_re_con__', key)
-        setattr(func, '__lament_re_pattern__', key)
+        setattr(func, '__lament_re_pattern__', pattern)
         setattr(func, '__lament_re_df__', default)
         return func
     return _con

@@ -11,6 +11,7 @@ class LamentConfig(object):
 
     def __init__(self, **kwargs):
         self._config = _get_instances(self._defaults)
+        self._re_config = {key: {} for key in self._re_keys}
         self.update(**kwargs)
 
     @classmethod
@@ -55,7 +56,7 @@ class LamentConfig(object):
         return key in self._re_keys and match(self._re_patterns[key], sub)
 
     def _re_oldval(self, key, sub):
-        return self._re_config[key].set_default(sub, self._re_defaults[key]())
+        return self._re_config[key].setdefault(sub, self._re_defaults[key]())
 
     def export_to_file(self, file_path):
         with ConfigFile(file_path, True) as outp:
