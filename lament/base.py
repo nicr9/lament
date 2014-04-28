@@ -45,7 +45,7 @@ class LamentConfig(object):
             split_key = key.split()
             if len(split_key) == 2:
                 key, sub = split_key
-                if self._re_match(key, sub):
+                if self._re_match(key, sub) and self._re_type(key, val):
                     old = self._re_oldval(key, sub)
                     self._re_config[key][sub] = getattr(self, '_re_con_%s' % key)(
                             old,
@@ -54,6 +54,9 @@ class LamentConfig(object):
 
     def _re_match(self, key, sub):
         return key in self._re_keys and match(self._re_patterns[key], sub)
+
+    def _re_type(self, key, val):
+        return isinstance(val, self._re_defaults[key])
 
     def _re_oldval(self, key, sub):
         return self._re_config[key].setdefault(sub, self._re_defaults[key]())
