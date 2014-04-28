@@ -290,7 +290,8 @@ class TestLamentConfig(unittest.TestCase):
                 list_type=10,
                 dict_type=ABCD,
                 bool_type=True,
-                list_int_only=1
+                list_int_only=1,
+                **{'regex_string mario': 'luigi'}
                 )
         self.assertEqual(
                 temp.export(),
@@ -300,6 +301,7 @@ class TestLamentConfig(unittest.TestCase):
                     'dict_type': ABCD,
                     'bool_type': True,
                     'list_int_only': [1],
+                    'regex_string mario': 'luigi',
                     }
                 )
 
@@ -309,6 +311,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(dict_type=EFGH)
         temp.update(bool_type=False)
         temp.update(list_int_only='b')
+        temp.update(**{'regex_string sonic': 'tails'})
         self.assertEqual(
                 temp.export(),
                 {
@@ -317,6 +320,8 @@ class TestLamentConfig(unittest.TestCase):
                     'dict_type': ALL_LETTERS,
                     'bool_type': False,
                     'list_int_only': [1],
+                    'regex_string mario': 'luigi',
+                    'regex_string sonic': 'tails',
                     }
                 )
 
@@ -326,7 +331,8 @@ class TestLamentConfig(unittest.TestCase):
                 list_type=10,
                 dict_type=ABCD,
                 bool_type=True,
-                list_int_only=1
+                list_int_only=1,
+                **{'regex_string mario': 'luigi'}
                 )
 
         with TF(delete=False) as f:
@@ -342,7 +348,9 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [1],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'mario': 'luigi'
+                },
             })
 
         before2 = ExampleConfig(
@@ -350,7 +358,8 @@ class TestLamentConfig(unittest.TestCase):
                 list_type=[4, 5, 6],
                 dict_type=EFGH,
                 bool_type=False,
-                list_int_only='b'
+                list_int_only='b',
+                **{'regex_string sonic': 'tails'}
                 )
 
         with TF(delete=False) as f:
@@ -366,7 +375,9 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {},
+            'regex_string': {
+                'sonic': 'tails'
+                },
             })
 
         # Clean up
