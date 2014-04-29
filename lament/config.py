@@ -5,6 +5,8 @@ import os.path
 class ConfigFile(object):
     def __init__(self, config_path, create=False):
         self.head = os.path.dirname(config_path)
+        if self.head == '': self.head = '.'
+
         self.create = create
         self.config = None
 
