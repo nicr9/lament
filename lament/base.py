@@ -46,12 +46,15 @@ class LamentConfig(object):
             if len(split_key) == 2:
                 key, sub = split_key
                 if self._re_match(key, sub):
-                    old = self._re_oldval(key, sub)
                     new = getattr(self, '_re_con_%s' % key)(
-                            old if old is not None else self._re_defaults[key](),
+                            self._re_oldval(key, sub),
                             val
                             )
-                    if isinstance(new, self._re_defaults[key]):
+
+                    # If new val is None, take it out of config
+                    if new is None and sub in self._re_config[key]:
+                        del self._re_config[key][sub]
+                    elif new is not None:
                         self._re_config[key][sub] = new
 
     def _re_match(self, key, sub):
