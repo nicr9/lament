@@ -17,6 +17,27 @@ ALL_LETTERS.update(EFGH)
 
 SUPER_MARIO = {'regex_string mario': 'luigi'}
 SONIC_HEDGEHOG = {'regex_string sonic': 'tails'}
+RES_MARIO = {'mario': 'luigi'}
+RES_SONIC = {'sonic': 'tails'}
+ALL_VIDEOGAMES = {}
+ALL_VIDEOGAMES.update(RES_MARIO)
+ALL_VIDEOGAMES.update(RES_SONIC)
+
+GOOGLE = {'regex_tuple www.google.com': 'localhost:443'}
+YAHOO = {'regex_tuple www.yahoo.com': 'localhost:80'}
+RES_GOOGLE = {'www.google.com': ('localhost', 443)}
+RES_YAHOO = {'www.yahoo.com': ('localhost', 80)}
+ALL_WEBSITES = {}
+ALL_WEBSITES.update(RES_GOOGLE)
+ALL_WEBSITES.update(RES_YAHOO)
+
+FIRST_RE_CONF = {}
+FIRST_RE_CONF.update(SUPER_MARIO)
+FIRST_RE_CONF.update(GOOGLE)
+
+SECOND_RE_CONF = {}
+SECOND_RE_CONF.update(SONIC_HEDGEHOG)
+SECOND_RE_CONF.update(YAHOO)
 
 DEFAULT_VALS = {
         'str_type': '',
@@ -27,6 +48,7 @@ DEFAULT_VALS = {
         }
 DEFAULT_RE_VALS = {
         'regex_string': {},
+        'regex_tuple': {},
         }
 
 # Example subclass
@@ -69,6 +91,11 @@ class ExampleConfig(LamentConfig):
         else:
             return config
 
+    @regex_config('regex_tuple', '.*\..*\.com', tuple)
+    def regex_tuple(self, config, obj):
+        host, port = obj.split(':')[:2]
+        return (host, int(port))
+
     @export('list_int_only')
     def export_int_only(self, obj):
         return [z for z in obj if isinstance(z, int)]
@@ -96,6 +123,7 @@ class TestLamentConfig(unittest.TestCase):
 
         # Check regex keys contain dicts
         self.assertEqual(config.regex_string, re_vals['regex_string'])
+        self.assertEqual(config.regex_tuple, re_vals['regex_tuple'])
 
     def test_create(self):
         # Create with default values
@@ -110,6 +138,7 @@ class TestLamentConfig(unittest.TestCase):
                 dict_type=ABCD,
                 bool_type=True,
                 list_int_only=1,
+                **FIRST_RE_CONF
                 )
 
         self._check_values(temp, {
@@ -118,7 +147,12 @@ class TestLamentConfig(unittest.TestCase):
             'dict_type': ABCD,
             'bool_type': True,
             'list_int_only': [1],
-            }, DEFAULT_RE_VALS)
+            },
+            {
+                'regex_string': RES_MARIO,
+                'regex_tuple': RES_GOOGLE,
+                }
+            )
 
     def test_alter(self):
         # Create with default values
@@ -132,7 +166,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
         temp.update(list_int_only=[1, 2, 3])
-        temp.update(**SUPER_MARIO)
+        temp.update(**FIRST_RE_CONF)
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -142,9 +176,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [1, 2, 3],
             },
             {
-            'regex_string': {
-                'mario': 'luigi',
-                },
+            'regex_string': RES_MARIO,
+            'regex_tuple': RES_GOOGLE,
             })
 
         # Create with overridden values
@@ -153,7 +186,7 @@ class TestLamentConfig(unittest.TestCase):
                 list_type=5,
                 dict_type=ABCD,
                 bool_type=True,
-                **SUPER_MARIO
+                **SECOND_RE_CONF
                 )
 
         self._check_values(temp, {
@@ -164,9 +197,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {
-                'mario': 'luigi',
-                },
+            'regex_string': RES_SONIC,
+            'regex_tuple': RES_YAHOO,
             })
 
         # Update values
@@ -174,7 +206,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update(list_type=1)
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
-        temp.update(**SONIC_HEDGEHOG)
+        temp.update(**FIRST_RE_CONF)
 
         self._check_values(temp, {
             'str_type': 'ello',
@@ -184,34 +216,34 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {
-                'mario': 'luigi',
-                'sonic': 'tails',
-                },
+            'regex_string': ALL_VIDEOGAMES,
+            'regex_tuple': ALL_WEBSITES,
             })
 
     def test_from_file(self):
         with TF(delete=False) as f:
             first = f.name
-            dump({
+            temp = {
                 'str_type':'foo',
                 'list_type': [1, 2, 3],
                 'dict_type': ABCD,
                 'bool_type': True,
                 'list_int_only': [],
-                'regex_string mario': 'luigi',
-                }, f)
+                }
+            temp.update(FIRST_RE_CONF)
+            dump(temp, f)
 
         with TF(delete=False) as f:
             second = f.name
-            dump({
+            temp = {
                 'str_type':'bar',
                 'list_type': [4, 5, 6],
                 'dict_type': EFGH,
                 'bool_type': False,
                 'list_int_only': [],
-                'regex_string sonic': 'tails',
-                }, f)
+                }
+            temp.update(SECOND_RE_CONF)
+            dump(temp, f)
 
         temp = ExampleConfig.from_file(first)
         self._check_values(temp, {
@@ -222,9 +254,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {
-                'mario': 'luigi',
-                },
+            'regex_string': RES_MARIO,
+            'regex_tuple': RES_GOOGLE,
             })
 
         temp.update_from_file(second)
@@ -236,10 +267,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {
-                'mario': 'luigi',
-                'sonic': 'tails',
-                },
+            'regex_string': ALL_VIDEOGAMES,
+            'regex_tuple': ALL_WEBSITES,
             })
 
         # Clean up
@@ -323,9 +352,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [1],
             },
             {
-            'regex_string': {
-                'mario': 'luigi'
-                },
+            'regex_string': RES_MARIO,
+            'regex_tuple': {},
             })
 
         before2 = ExampleConfig(
@@ -350,9 +378,8 @@ class TestLamentConfig(unittest.TestCase):
             'list_int_only': [],
             },
             {
-            'regex_string': {
-                'sonic': 'tails'
-                },
+            'regex_string': RES_SONIC,
+            'regex_tuple': {},
             })
 
         # Clean up
