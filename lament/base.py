@@ -1,6 +1,7 @@
 from re import match
 from config import ConfigFile
 from meta import ConfigMeta
+from collections import defaultdict
 
 def _get_instances(types):
     return {key: val() for key, val in types.iteritems()}
@@ -10,7 +11,7 @@ class LamentConfig(object):
 
     def __init__(self, **kwargs):
         self._config = _get_instances(self._defaults)
-        self._re_config = {key: {} for key in self._re_keys}
+        self._re_config = defaultdict(dict)
         self.update(**kwargs)
 
     @classmethod
