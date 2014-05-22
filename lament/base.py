@@ -1,7 +1,6 @@
 from re import match
 from config import ConfigFile
 from meta import ConfigMeta
-from copy import deepcopy
 
 def _get_instances(types):
     return {key: val() for key, val in types.iteritems()}

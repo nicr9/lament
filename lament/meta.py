@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 class ConfigMeta(type):
     def __new__(mcls, name, bases, cdict):
         _config_keys = []
