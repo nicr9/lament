@@ -39,8 +39,11 @@ SECOND_RE_CONF = {}
 SECOND_RE_CONF.update(SONIC_HEDGEHOG)
 SECOND_RE_CONF.update(YAHOO)
 
+STR_W_DEFAULT = "The cake is a lie."
+
 DEFAULT_VALS = {
         'str_type': '',
+        'str_w_default': STR_W_DEFAULT,
         'list_type': [],
         'dict_type': {},
         'bool_type': False,
@@ -55,6 +58,12 @@ DEFAULT_RE_VALS = {
 class ExampleConfig(LamentConfig):
     @config('str_type', str)
     def str_type(self, config, obj):
+        if isinstance(obj, str):
+            return obj
+        return config
+
+    @config('str_w_default', str, default_value=STR_W_DEFAULT)
+    def str_w_default(self, config, obj):
         if isinstance(obj, str):
             return obj
         return config
@@ -116,6 +125,7 @@ class TestLamentConfig(unittest.TestCase):
 
         # Check key values
         self.assertEqual(config.str_type, vals['str_type'])
+        self.assertEqual(config.str_w_default, vals['str_w_default'])
         self.assertEqual(config.list_type, vals['list_type'])
         self.assertEqual(config.dict_type,vals['dict_type'])
         self.assertEqual(config.bool_type, vals['bool_type'])
@@ -134,6 +144,7 @@ class TestLamentConfig(unittest.TestCase):
         # Create with overridden values
         temp = ExampleConfig(
                 str_type='hi',
+                str_w_default='The cake is not a lie.',
                 list_type=5,
                 dict_type=ABCD,
                 bool_type=True,
@@ -143,6 +154,7 @@ class TestLamentConfig(unittest.TestCase):
 
         self._check_values(temp, {
             'str_type': 'hi',
+            'str_w_default': 'The cake is not a lie.',
             'list_type': [5],
             'dict_type': ABCD,
             'bool_type': True,
@@ -162,6 +174,7 @@ class TestLamentConfig(unittest.TestCase):
 
         # Update values
         temp.update(str_type='ello')
+        temp.update(str_w_default='Blah!')
         temp.update(list_type='1')
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
@@ -170,6 +183,7 @@ class TestLamentConfig(unittest.TestCase):
 
         self._check_values(temp, {
             'str_type': 'ello',
+            'str_w_default': 'Blah!',
             'list_type': ['1'],
             'dict_type': EFGH,
             'bool_type': True,
@@ -183,6 +197,7 @@ class TestLamentConfig(unittest.TestCase):
         # Create with overridden values
         temp = ExampleConfig(
                 str_type='hi',
+                str_w_default='hello',
                 list_type=5,
                 dict_type=ABCD,
                 bool_type=True,
@@ -191,6 +206,7 @@ class TestLamentConfig(unittest.TestCase):
 
         self._check_values(temp, {
             'str_type': 'hi',
+            'str_w_default': 'hello',
             'list_type': [5],
             'dict_type': ABCD,
             'bool_type': True,
@@ -203,6 +219,7 @@ class TestLamentConfig(unittest.TestCase):
 
         # Update values
         temp.update(str_type='ello')
+        temp.update(str_w_default='Hello darkness my old friend...')
         temp.update(list_type=1)
         temp.update(dict_type=EFGH)
         temp.update(bool_type=True)
@@ -210,6 +227,7 @@ class TestLamentConfig(unittest.TestCase):
 
         self._check_values(temp, {
             'str_type': 'ello',
+            'str_w_default': 'Hello darkness my old friend...',
             'list_type': [5, 1],
             'dict_type': ALL_LETTERS,
             'bool_type': True,
@@ -225,6 +243,7 @@ class TestLamentConfig(unittest.TestCase):
             first = f.name
             temp = {
                 'str_type':'foo',
+                'str_w_default':'foobar',
                 'list_type': [1, 2, 3],
                 'dict_type': ABCD,
                 'bool_type': True,
@@ -237,6 +256,7 @@ class TestLamentConfig(unittest.TestCase):
             second = f.name
             temp = {
                 'str_type':'bar',
+                'str_w_default':'fizzbang',
                 'list_type': [4, 5, 6],
                 'dict_type': EFGH,
                 'bool_type': False,
@@ -248,6 +268,7 @@ class TestLamentConfig(unittest.TestCase):
         temp = ExampleConfig.from_file(first)
         self._check_values(temp, {
             'str_type': 'foo',
+            'str_w_default': 'foobar',
             'list_type': [1, 2, 3],
             'dict_type': ABCD,
             'bool_type': True,
@@ -261,6 +282,7 @@ class TestLamentConfig(unittest.TestCase):
         temp.update_from_file(second)
         self._check_values(temp, {
             'str_type': 'bar',
+            'str_w_default': 'fizzbang',
             'list_type': [4, 5, 6],
             'dict_type': ALL_LETTERS,
             'bool_type': False,
@@ -282,6 +304,7 @@ class TestLamentConfig(unittest.TestCase):
     def test_wrong_type(self):
         temp = ExampleConfig(
                 str_type=10,
+                str_w_default=10,
                 dict_type=10,
                 bool_type=0,
                 **{'regex_string badtype': 2}
@@ -291,6 +314,7 @@ class TestLamentConfig(unittest.TestCase):
     def test_export(self):
         temp = ExampleConfig(
                 str_type='Blah',
+                str_w_default='Moo!',
                 list_type=10,
                 dict_type=ABCD,
                 bool_type=True,
@@ -301,6 +325,7 @@ class TestLamentConfig(unittest.TestCase):
                 temp.export(),
                 {
                     'str_type': 'Blah',
+                    'str_w_default': 'Moo!',
                     'list_type': [10],
                     'dict_type': ABCD,
                     'bool_type': True,
@@ -311,6 +336,7 @@ class TestLamentConfig(unittest.TestCase):
 
         # Update values
         temp.update(str_type='ello')
+        temp.update(str_w_default='goodbye')
         temp.update(list_type=1)
         temp.update(dict_type=EFGH)
         temp.update(bool_type=False)
@@ -320,6 +346,7 @@ class TestLamentConfig(unittest.TestCase):
                 temp.export(),
                 {
                     'str_type': 'ello',
+                    'str_w_default': 'goodbye',
                     'list_type': [10, 1],
                     'dict_type': ALL_LETTERS,
                     'bool_type': False,
@@ -332,6 +359,7 @@ class TestLamentConfig(unittest.TestCase):
     def test_to_file(self):
         before = ExampleConfig(
                 str_type='Blah',
+                str_w_default='Moo!',
                 list_type=10,
                 dict_type=ABCD,
                 bool_type=True,
@@ -346,6 +374,7 @@ class TestLamentConfig(unittest.TestCase):
         after = ExampleConfig.from_file(first)
         self._check_values(after, {
             'str_type': 'Blah',
+            'str_w_default': 'Moo!',
             'list_type': [10],
             'dict_type': ABCD,
             'bool_type': True,
@@ -358,6 +387,7 @@ class TestLamentConfig(unittest.TestCase):
 
         before2 = ExampleConfig(
                 str_type='bar',
+                str_w_default='foo',
                 list_type=[4, 5, 6],
                 dict_type=EFGH,
                 bool_type=False,
@@ -372,6 +402,7 @@ class TestLamentConfig(unittest.TestCase):
         after2 = ExampleConfig.from_file(second)
         self._check_values(after2, {
             'str_type':'bar',
+            'str_w_default':'foo',
             'list_type': [4, 5, 6],
             'dict_type': EFGH,
             'bool_type': False,
