@@ -2,6 +2,7 @@ class ConfigMeta(type):
     def __new__(mcls, name, bases, cdict):
         _config_keys = []
         _defaults = {}
+        _default_values = {}
         _re_keys = []
         _re_patterns = {}
         _re_defaults = {}
@@ -22,6 +23,8 @@ class ConfigMeta(type):
                 if hasattr(value, '__lament_con__'):
                     _config_keys.append(value.__lament_con__)
                     _defaults[value.__lament_con__] = value.__lament_df__
+                    if value.__lament_dv__ is not None:
+                        _default_values[value.__lament_con__] = value.__lament_dv__
                     cdict['_con_%s' % key] = value
                     del cdict[key]
 
@@ -38,6 +41,7 @@ class ConfigMeta(type):
 
         cdict['_config_keys'] = _config_keys
         cdict['_defaults']  = _defaults
+        cdict['_default_values']  = _default_values
 
         cdict['_re_keys'] = _re_keys
         cdict['_re_patterns'] = _re_patterns
@@ -51,10 +55,11 @@ class ConfigMeta(type):
 
         return super(ConfigMeta, mcls).__new__(mcls, name, bases, cdict)
 
-def config(key, default):
+def config(key, default_type, default_value=None):
     def _con(func):
         setattr(func, '__lament_con__', key)
-        setattr(func, '__lament_df__', default)
+        setattr(func, '__lament_df__', default_type)
+        setattr(func, '__lament_dv__', default_value)
         return func
     return _con
 

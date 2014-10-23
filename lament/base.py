@@ -3,14 +3,23 @@ from config import ConfigFile
 from meta import ConfigMeta
 from collections import defaultdict
 
-def _get_instances(types):
-    return {key: val() for key, val in types.iteritems()}
+def _get_instances(types, values):
+    # Each option should start with an instance of it's type
+    defaults = {key: val() for key, val in types.iteritems()}
+
+    # This may be replaced with a user specified instance of that type
+    overrides = {key: val
+            for key, val in values.iteritems()
+            if isinstance(val, types[key])}
+    defaults.update(overrides)
+
+    return defaults
 
 class LamentConfig(object):
     __metaclass__ = ConfigMeta
 
     def __init__(self, **kwargs):
-        self._config = _get_instances(self._defaults)
+        self._config = _get_instances(self._defaults, self._default_values)
         self._re_config = defaultdict(dict)
         self.update(**kwargs)
 
