@@ -56,36 +56,36 @@ DEFAULT_RE_VALS = {
 
 # Example subclass
 class ExampleConfig(LamentConfig):
-    @config('str_type', str)
+    @config(str)
     def str_type(self, config, obj):
         if isinstance(obj, str):
             return obj
         return config
 
-    @config('str_w_default', str, default_value=STR_W_DEFAULT)
+    @config(str, default_value=STR_W_DEFAULT)
     def str_w_default(self, config, obj):
         if isinstance(obj, str):
             return obj
         return config
 
-    @config('list_type', list)
+    @config(list)
     def list_type(self, config, obj):
         if isinstance(obj, list):
             return obj
         config.append(obj)
         return config
 
-    @config('dict_type', dict)
+    @config(dict)
     def dict_type(self, config, obj):
         if isinstance(obj, dict):
             config.update(obj)
         return config
 
-    @config('bool_type', bool)
+    @config(bool)
     def bool_type(self, config, obj):
         return obj
 
-    @config('list_int_only', list)
+    @config(list)
     def list_int_only(self, config, obj):
         if isinstance(obj, list):
             config.extend(obj)
@@ -93,14 +93,14 @@ class ExampleConfig(LamentConfig):
             config.append(obj)
         return config
 
-    @regex_config('regex_string', '.*', str)
+    @regex_config('.*', str)
     def regex_string(self, config, obj):
         if isinstance(obj, str):
             return obj
         else:
             return config
 
-    @regex_config('regex_tuple', '.*\..*\.com', tuple)
+    @regex_config('.*\..*\.com', tuple)
     def regex_tuple(self, config, obj):
         host, port = obj.split(':')[:2]
         return (host, int(port))

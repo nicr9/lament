@@ -55,7 +55,7 @@ class ConfigMeta(type):
 
         return super(ConfigMeta, mcls).__new__(mcls, name, bases, cdict)
 
-def config(key, default_type, default_value=None):
+def config(default_type, default_value=None):
     def _con(func):
         setattr(func, '__lament_con__', None)
         setattr(func, '__lament_df__', default_type)
@@ -63,11 +63,11 @@ def config(key, default_type, default_value=None):
         return func
     return _con
 
-def regex_config(key, pattern, default):
+def regex_config(pattern, default_type):
     def _con(func):
         setattr(func, '__lament_re_con__', None)
         setattr(func, '__lament_re_pattern__', pattern)
-        setattr(func, '__lament_re_df__', default)
+        setattr(func, '__lament_re_df__', default_type)
         return func
     return _con
 
