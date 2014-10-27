@@ -21,10 +21,10 @@ class ConfigMeta(type):
             if key not in ignored_keys:
 
                 if hasattr(value, '__lament_con__'):
-                    _config_keys.append(value.__lament_con__)
-                    _defaults[value.__lament_con__] = value.__lament_df__
+                    _config_keys.append(key)
+                    _defaults[key] = value.__lament_df__
                     if value.__lament_dv__ is not None:
-                        _default_values[value.__lament_con__] = value.__lament_dv__
+                        _default_values[key] = value.__lament_dv__
                     cdict['_con_%s' % key] = value
                     del cdict[key]
 
@@ -57,7 +57,7 @@ class ConfigMeta(type):
 
 def config(key, default_type, default_value=None):
     def _con(func):
-        setattr(func, '__lament_con__', key)
+        setattr(func, '__lament_con__', None)
         setattr(func, '__lament_df__', default_type)
         setattr(func, '__lament_dv__', default_value)
         return func
