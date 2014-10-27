@@ -29,9 +29,9 @@ class ConfigMeta(type):
                     del cdict[key]
 
                 if hasattr(value, '__lament_re_con__'):
-                    _re_keys.append(value.__lament_re_con__)
-                    _re_patterns[value.__lament_re_con__] = value.__lament_re_pattern__
-                    _re_defaults[value.__lament_re_con__] = value.__lament_re_df__
+                    _re_keys.append(key)
+                    _re_patterns[key] = value.__lament_re_pattern__
+                    _re_defaults[key] = value.__lament_re_df__
                     cdict['_re_con_%s' % key] = value
                     del cdict[key]
 
@@ -65,7 +65,7 @@ def config(key, default_type, default_value=None):
 
 def regex_config(key, pattern, default):
     def _con(func):
-        setattr(func, '__lament_re_con__', key)
+        setattr(func, '__lament_re_con__', None)
         setattr(func, '__lament_re_pattern__', pattern)
         setattr(func, '__lament_re_df__', default)
         return func
