@@ -16,9 +16,9 @@ class ConfigMeta(type):
             else:
                 super(object, self).__getattr__(name)
 
-        allowed = set(['__module__', '__metaclass__', '__doc__'])
+        ignored_keys = set(['__module__', '__metaclass__', '__doc__'])
         for key, value in cdict.items():
-            if key not in allowed:
+            if key not in ignored_keys:
 
                 if hasattr(value, '__lament_con__'):
                     _config_keys.append(value.__lament_con__)
