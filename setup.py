@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-VERSION = 'v0.4'
+VERSION = 'v0.5'
 
 setup(
     name='lament',
