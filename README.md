@@ -89,4 +89,4 @@ This project's name was inspired by the puzzle box in the [Hellraiser movies](ht
 
 ## Licence
 
-`lament` is released under the [Mozilla Public License Version 2.0](http://opensource.org/licenses/MPL-2.0).
+`lament` is released under the [MIT License](http://opensource.org/licenses/MIT).
