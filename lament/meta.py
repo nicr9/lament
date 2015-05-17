@@ -14,7 +14,9 @@ class ConfigMeta(type):
             if name in self._re_keys:
                 return self._re_config[name]
             else:
-                super(object, self).__getattr__(name)
+                raise AttributeError(
+                        "Couldn't find '%s' in schema definition." % name
+                        )
 
         ignored_keys = set(['__module__', '__metaclass__', '__doc__'])
         for key, value in cdict.items():
